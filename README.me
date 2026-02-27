@@ -1,0 +1,168 @@
+# 📋 Task Manager — Bash Script
+
+A command-line Task Management System built entirely in **Bash**.  
+Supports full CRUD operations, filtering, reports, CSV export, and colored terminal output.
+
+---
+
+## 📁 Project Structure
+
+```
+├── task_manager.sh      # main script
+├── tasks.txt            # auto-generated data file (created on first run)
+└── README.md
+```
+
+---
+
+## 🚀 How to Run
+
+```bash
+bash task_manager.sh
+```
+
+> No dependencies needed — works on any Linux system with Bash installed.
+
+---
+
+## 🗂️ Data Storage
+
+All tasks are stored in `tasks.txt`, one task per line, fields separated by `|`:
+
+```
+ID|Title|Priority|DueDate|Status
+```
+
+**Example:**
+```
+1|Buy groceries|high|2025-06-01|pending
+2|Study for exam|medium|2025-05-20|in-progress
+3|Submit report|low|2025-04-10|done
+```
+
+| Field    | Values                          |
+|----------|---------------------------------|
+| ID       | Auto-generated integer          |
+| Title    | Any text (no `\|` allowed)      |
+| Priority | `high` / `medium` / `low`       |
+| Due Date | `YYYY-MM-DD` format             |
+| Status   | `pending` / `in-progress` / `done` |
+
+---
+
+## ✨ Features
+
+### CRUD Operations
+
+| # | Feature     | Description                                              |
+|---|-------------|----------------------------------------------------------|
+| 1 | Add Task    | Enter title, priority, due date — ID and status auto-set |
+| 2 | List Tasks  | Display all tasks; filter by status or priority          |
+| 3 | Update Task | Select by ID, modify any field                           |
+| 4 | Delete Task | Select by ID, confirm before deleting                    |
+| 5 | Search      | Case-insensitive keyword search in task titles           |
+
+### Reports
+
+| Report         | Description                                          |
+|----------------|------------------------------------------------------|
+| Summary        | Count of tasks per status                            |
+| Overdue Tasks  | Tasks past due date that are not `done`              |
+| By Priority    | Tasks grouped into high → medium → low               |
+
+### Bonus Features
+
+- 🎨 **Colored output** — priorities and statuses highlighted in different colors
+- 📤 **CSV Export** — exports tasks to a `.csv` file (opens in Excel / Google Sheets)
+- 🔃 **Sort** — sort tasks by due date or by priority
+
+---
+
+## 🖥️ Main Menu
+
+```
+==============================
+      task manager
+==============================
+1) add task
+2) list tasks
+3) update task
+4) delete task
+5) search
+6) reports
+7) export csv
+8) sort
+0) exit
+==============================
+```
+
+---
+
+## ✅ Input Validation
+
+| Field    | Validation                                              |
+|----------|---------------------------------------------------------|
+| Title    | Cannot be empty                                         |
+| Priority | Must be exactly: `high`, `medium`, or `low`             |
+| Due Date | Must match `YYYY-MM-DD` and be a real calendar date     |
+| ID       | Must exist in file before update or delete              |
+
+---
+
+## 🔧 Key Bash Concepts Used
+
+| Concept               | Usage                                      |
+|-----------------------|--------------------------------------------|
+| `while IFS read`      | Reading and parsing the tasks file         |
+| `sed -i`              | In-place line replacement (update)         |
+| `grep -v`             | Filtering out deleted lines                |
+| `cut / awk`           | Field extraction                           |
+| `sort -t -k`          | Sorting by specific field                  |
+| `date -d`             | Date validation                            |
+| `grep -qE`            | Regex-based format checking                |
+| ANSI escape codes     | Terminal colors (`\033[0;31m` etc.)        |
+| `mktemp`              | Safe temporary file creation               |
+| `local` variables     | Scoped variables inside functions          |
+
+---
+
+## 🌈 Color Reference
+
+| Color    | Used For                    |
+|----------|-----------------------------|
+| 🔴 Red    | High priority / Errors      |
+| 🟡 Yellow | Medium priority / Pending   |
+| 🟢 Green  | Low priority / Done         |
+| 🔵 Cyan   | In-progress status          |
+
+---
+
+## 📤 CSV Export
+
+Running option `7` from the menu generates a file like:
+
+```
+tasks_export_20250601.csv
+```
+
+Format:
+```csv
+ID,Title,Priority,Due Date,Status
+1,"Buy groceries",high,2025-06-01,pending
+2,"Study for exam",medium,2025-05-20,done
+```
+
+---
+
+## ⚠️ Known Limitations
+
+- Task titles cannot contain the `|` character (used as delimiter)
+- IDs are never reused after deletion (by design)
+- Concurrent access by multiple users is not supported
+
+---
+
+## 👤 Author
+
+**Ahmed Ali**  
+Bash Scripting Assignment — Linux Course
