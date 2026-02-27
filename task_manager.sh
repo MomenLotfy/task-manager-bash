@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # task manager - bash assignment
-# my name: ahmed ali
-# sec: 2 , bench: 17
+# my name: moamen lotfy
 
 TASKS_FILE="tasks.txt"
 
