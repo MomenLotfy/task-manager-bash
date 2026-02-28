@@ -1,470 +1,237 @@
-#!/bin/bash
-
-# task manager - bash assignment
-# my name: moamen lotfy
+#!/usr/bin/env bash
+# =============================================================================
+# Mini Task Manager - Bash Project by Moamen Lotfy
+# =============================================================================
 
 TASKS_FILE="tasks.txt"
+DELIMITER="|"
 
-# colors i found online
+# ANSI Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
-NC='\033[0m'
+NC='\033[0m' # No Color
 
-# create file if not there
-if [ ! -f "$TASKS_FILE" ]; then
-    touch "$TASKS_FILE"
-fi
-
-####################################
-# helper functions
-####################################
-
-get_next_id(){
-    if [ ! -s "$TASKS_FILE" ]; then
+# ----------------------
+# Utility Functions
+# ----------------------
+next_id() {
+    if [[ ! -f $TASKS_FILE ]] || [[ ! -s $TASKS_FILE ]]; then
         echo 1
-        return
-    fi
-    # get max id then add 1
-    max=$(cut -d"|" -f1 "$TASKS_FILE" | sort -n | tail -1)
-    echo $(( max + 1 ))
-}
-
-check_id_exists(){
-    grep -q "^$1|" "$TASKS_FILE"
-}
-
-valid_priority(){
-    [ "$1" = "high" ] || [ "$1" = "medium" ] || [ "$1" = "low" ]
-}
-
-valid_status(){
-    [ "$1" = "pending" ] || [ "$1" = "in-progress" ] || [ "$1" = "done" ]
-}
-
-valid_date(){
-    # check format first
-    echo "$1" | grep -qE "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" || return 1
-    date -d "$1" &>/dev/null
-}
-
-# print the table header line
-table_header(){
-    echo "--------------------------------------------------------------"
-    printf "%-4s  %-22s  %-8s  %-11s  %-11s\n" "ID" "Title" "Priority" "Due Date" "Status"
-    echo "--------------------------------------------------------------"
-}
-
-# print single task row with colors
-print_task(){
-    local id=$1 title=$2 pri=$3 due=$4 stat=$5
-
-    # trim title
-    if [ ${#title} -gt 20 ]; then
-        title="${title:0:18}.."
-    fi
-
-    # pick color for priority
-    local pc=$NC
-    [ "$pri" = "high" ]   && pc=$RED
-    [ "$pri" = "medium" ] && pc=$YELLOW
-    [ "$pri" = "low" ]    && pc=$GREEN
-
-    # pick color for status
-    local sc=$NC
-    [ "$stat" = "done" ]        && sc=$GREEN
-    [ "$stat" = "in-progress" ] && sc=$CYAN
-    [ "$stat" = "pending" ]     && sc=$YELLOW
-
-    printf "%-4s  %-22s  ${pc}%-8s${NC}  %-11s  ${sc}%-11s${NC}\n" \
-        "$id" "$title" "$pri" "$due" "$stat"
-}
-
-press_enter(){
-    echo ""
-    read -p "press enter..."
-}
-
-####################################
-# 1. Add task
-####################################
-add_task(){
-    echo ""
-    echo "== Add Task =="
-
-    # title - cant be empty
-    local title=""
-    while [ -z "$title" ]; do
-        read -p "title: " title
-        [ -z "$title" ] && echo -e "${RED}title is required${NC}"
-    done
-
-    # priority
-    local pri=""
-    while ! valid_priority "$pri"; do
-        read -p "priority (high/medium/low): " pri
-        valid_priority "$pri" || echo -e "${RED}wrong, try again${NC}"
-    done
-
-    # due date
-    local due=""
-    while ! valid_date "$due" 2>/dev/null; do
-        read -p "due date (YYYY-MM-DD): " due
-        valid_date "$due" 2>/dev/null || echo -e "${RED}bad date format${NC}"
-    done
-
-    local id=$(get_next_id)
-    echo "$id|$title|$pri|$due|pending" >> "$TASKS_FILE"
-
-    echo -e "${GREEN}task added with id=$id${NC}"
-}
-
-####################################
-# 2. List tasks
-####################################
-list_tasks(){
-    echo ""
-    echo "== List Tasks =="
-    echo "1) all"
-    echo "2) filter by status"
-    echo "3) filter by priority"
-    read -p "> " ch
-
-    local fcol="" fval=""
-
-    if [ "$ch" = "2" ]; then
-        read -p "status (pending/in-progress/done): " fval
-        fcol="status"
-    elif [ "$ch" = "3" ]; then
-        read -p "priority (high/medium/low): " fval
-        fcol="priority"
-    fi
-
-    echo ""
-    table_header
-
-    local cnt=0
-    while IFS="|" read -r id title pri due stat; do
-        # filter logic
-        if [ "$fcol" = "status" ]   && [ "$stat" != "$fval" ]; then continue; fi
-        if [ "$fcol" = "priority" ] && [ "$pri"  != "$fval" ]; then continue; fi
-
-        print_task "$id" "$title" "$pri" "$due" "$stat"
-        cnt=$(( cnt + 1 ))
-    done < "$TASKS_FILE"
-
-    echo "--------------------------------------------------------------"
-    echo "total: $cnt"
-}
-
-####################################
-# 3. Update task
-####################################
-update_task(){
-    echo ""
-    echo "== Update Task =="
-    read -p "enter id: " tid
-
-    if ! check_id_exists "$tid"; then
-        echo -e "${RED}id $tid not found${NC}"
-        return
-    fi
-
-    # get current values
-    local line=$(grep "^$tid|" "$TASKS_FILE")
-    IFS="|" read -r cid ctitle cpri cdue cstat <<< "$line"
-
-    echo ""
-    echo "current:"
-    table_header
-    print_task "$cid" "$ctitle" "$cpri" "$cdue" "$cstat"
-    echo ""
-
-    # new title
-    read -p "new title [$ctitle]: " ntitle
-    [ -z "$ntitle" ] && ntitle="$ctitle"
-
-    # new priority
-    read -p "new priority [$cpri]: " npri
-    if [ -z "$npri" ]; then
-        npri="$cpri"
-    elif ! valid_priority "$npri"; then
-        echo -e "${YELLOW}keeping old priority${NC}"
-        npri="$cpri"
-    fi
-
-    # new due date
-    read -p "new due date [$cdue]: " ndue
-    if [ -z "$ndue" ]; then
-        ndue="$cdue"
-    elif ! valid_date "$ndue" 2>/dev/null; then
-        echo -e "${YELLOW}bad date, keeping old one${NC}"
-        ndue="$cdue"
-    fi
-
-    # new status
-    read -p "new status [$cstat]: " nstat
-    if [ -z "$nstat" ]; then
-        nstat="$cstat"
-    elif ! valid_status "$nstat"; then
-        echo -e "${YELLOW}invalid status, keeping old one${NC}"
-        nstat="$cstat"
-    fi
-
-    # replace the line using sed
-    local newline="$tid|$ntitle|$npri|$ndue|$nstat"
-    local escaped=$(printf '%s\n' "$newline" | sed 's/[[\.*^$()+?{|]/\\&/g')
-    sed -i "s|^$tid|.*|$escaped|" "$TASKS_FILE"
-
-    echo -e "${GREEN}updated!${NC}"
-}
-
-####################################
-# 4. Delete task
-####################################
-delete_task(){
-    echo ""
-    echo "== Delete Task =="
-    read -p "enter id: " tid
-
-    if ! check_id_exists "$tid"; then
-        echo -e "${RED}id $tid doesnt exist${NC}"
-        return
-    fi
-
-    # show task before deleting
-    local line=$(grep "^$tid|" "$TASKS_FILE")
-    IFS="|" read -r d_id d_title d_pri d_due d_stat <<< "$line"
-
-    echo ""
-    table_header
-    print_task "$d_id" "$d_title" "$d_pri" "$d_due" "$d_stat"
-    echo ""
-
-    read -p "delete this? (yes/no): " confirm
-    if [ "$confirm" = "yes" ]; then
-        grep -v "^$tid|" "$TASKS_FILE" > /tmp/tasks_tmp.txt
-        mv /tmp/tasks_tmp.txt "$TASKS_FILE"
-        echo -e "${GREEN}done, task deleted${NC}"
     else
-        echo "ok cancelled"
+        tail -n 1 "$TASKS_FILE" | cut -d"$DELIMITER" -f1 | awk '{print $1+1}'
     fi
 }
 
-####################################
-# 5. Search by title
-####################################
-search_tasks(){
-    echo ""
-    echo "== Search =="
-    read -p "keyword: " kw
-
-    if [ -z "$kw" ]; then
-        echo -e "${RED}enter a keyword${NC}"
-        return
-    fi
-
-    echo ""
-    table_header
-
-    local cnt=0
-    while IFS="|" read -r id title pri due stat; do
-        # case insensitive search
-        if echo "$title" | grep -qi "$kw"; then
-            print_task "$id" "$title" "$pri" "$due" "$stat"
-            cnt=$(( cnt + 1 ))
-        fi
-    done < "$TASKS_FILE"
-
-    echo "--------------------------------------------------------------"
-    echo "found: $cnt"
-}
-
-####################################
-# reports
-####################################
-
-# summary - count by status
-summary_report(){
-    echo ""
-    echo "== Summary =="
-
-    local p=0 ip=0 d=0
-    while IFS="|" read -r id title pri due stat; do
-        case "$stat" in
-            pending)     p=$(( p + 1 ))  ;;
-            in-progress) ip=$(( ip + 1 )) ;;
-            done)        d=$(( d + 1 ))  ;;
-        esac
-    done < "$TASKS_FILE"
-
-    local total=$(( p + ip + d ))
-    echo -e "${YELLOW}pending:${NC}      $p"
-    echo -e "${CYAN}in-progress:${NC}  $ip"
-    echo -e "${GREEN}done:${NC}         $d"
-    echo "-------------------"
-    echo "total:        $total"
-}
-
-# overdue - not done and date passed
-overdue_report(){
-    echo ""
-    echo "== Overdue Tasks =="
-
-    local today=$(date +%Y-%m-%d)
-    local cnt=0
-
-    table_header
-    while IFS="|" read -r id title pri due stat; do
-        [ "$stat" = "done" ] && continue
-        # string compare works fine for YYYY-MM-DD
-        if [[ "$due" < "$today" ]]; then
-            print_task "$id" "$title" "$pri" "$due" "$stat"
-            cnt=$(( cnt + 1 ))
-        fi
-    done < "$TASKS_FILE"
-
-    echo "--------------------------------------------------------------"
-    if [ $cnt -eq 0 ]; then
-        echo -e "${GREEN}no overdue tasks!${NC}"
+validate_date() {
+    if [[ $1 =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+        return 0
     else
-        echo -e "${RED}$cnt overdue${NC}"
+        echo -e "${RED}Invalid date format! Use YYYY-MM-DD.${NC}"
+        return 1
     fi
 }
 
-# group by priority
-priority_report(){
-    echo ""
-    echo "== By Priority =="
-
-    for p in high medium low; do
-        echo ""
-        echo "[ $p ]"
-        printf "%-4s  %-22s  %-11s  %-11s\n" "ID" "Title" "Due Date" "Status"
-        echo "------------------------------------------------"
-
-        local cnt=0
-        while IFS="|" read -r id title pri due stat; do
-            if [ "$pri" = "$p" ]; then
-                [ ${#title} -gt 20 ] && title="${title:0:18}.."
-                printf "%-4s  %-22s  %-11s  %-11s\n" "$id" "$title" "$due" "$stat"
-                cnt=$(( cnt + 1 ))
-            fi
-        done < "$TASKS_FILE"
-
-        [ $cnt -eq 0 ] && echo "  (none)"
-    done
+validate_priority() {
+    case $1 in
+        high|medium|low) return 0 ;;
+        *) echo -e "${RED}Priority must be high, medium, or low.${NC}"; return 1 ;;
+    esac
 }
 
-####################################
-# bonus: export csv
-####################################
-export_csv(){
-    echo ""
-    echo "== Export CSV =="
+id_exists() {
+    grep -q "^$1$DELIMITER" "$TASKS_FILE" 2>/dev/null
+    return $?
+}
 
-    local fname="tasks_export_$(date +%Y%m%d).csv"
-    echo "ID,Title,Priority,Due Date,Status" > "$fname"
+# ----------------------
+# Core Functions
+# ----------------------
 
-    while IFS="|" read -r id title pri due stat; do
-        echo "$id,\"$title\",$pri,$due,$stat" >> "$fname"
+add_task() {
+    echo -e "${CYAN}--- Add New Task ---${NC}"
+    read -p "Enter task title: " title
+    [[ -z "$title" ]] && { echo -e "${RED}Title cannot be empty!${NC}"; return; }
+
+    read -p "Enter priority (high/medium/low): " priority
+    validate_priority "$priority" || return
+
+    read -p "Enter due date (YYYY-MM-DD): " due
+    validate_date "$due" || return
+
+    id=$(next_id)
+    status="pending"
+
+    echo "$id$DELIMITER$title$DELIMITER$priority$DELIMITER$due$DELIMITER$status" >> "$TASKS_FILE"
+    echo -e "${GREEN}Task added successfully!${NC}"
+}
+
+# Function to color-code status
+status_color() {
+    case $1 in
+        pending) echo -e "${YELLOW}$1${NC}" ;;
+        "in-progress") echo -e "${BLUE}$1${NC}" ;;
+        done) echo -e "${GREEN}$1${NC}" ;;
+        *) echo "$1" ;;
+    esac
+}
+
+# Function to color-code priority
+priority_color() {
+    case $1 in
+        high) echo -e "${RED}$1${NC}" ;;
+        medium) echo -e "${YELLOW}$1${NC}" ;;
+        low) echo -e "${GREEN}$1${NC}" ;;
+        *) echo "$1" ;;
+    esac
+}
+
+# Function to highlight overdue dates
+date_color() {
+    today=$(date +%Y-%m-%d)
+    if [[ "$1" < "$today" ]]; then
+        echo -e "${RED}$1${NC}"
+    else
+        echo "$1"
+    fi
+}
+
+list_tasks() {
+    echo -e "${CYAN}--- Task List ---${NC}"
+    [[ ! -f $TASKS_FILE ]] || [[ ! -s $TASKS_FILE ]] || awk -F"$DELIMITER" 'BEGIN{printf "%-3s | %-20s | %-10s | %-12s | %-12s\n","ID","Title","Priority","Due Date","Status"} {printf "%-3s | %-20s | %-10s | %-12s | %-12s\n",$1,$2,$3,$4,$5}' "$TASKS_FILE"
+
+    while IFS="$DELIMITER" read -r id title priority due status; do
+        p=$(priority_color "$priority")
+        s=$(status_color "$status")
+        d=$(date_color "$due")
+        printf "%-3s | %-20s | %-10b | %-12b | %-12b\n" "$id" "$title" "$p" "$d" "$s"
     done < "$TASKS_FILE"
 
-    echo -e "${GREEN}exported to $fname${NC}"
+    # Sorting option
+    echo -e "\nDo you want to sort tasks? (1) By Date (2) By Priority (3) No"
+    read -p "Choose: " sort_choice
+    case $sort_choice in
+        1)
+            echo -e "${CYAN}--- Tasks Sorted by Due Date ---${NC}"
+            sort -t"$DELIMITER" -k4 "$TASKS_FILE" | while IFS="$DELIMITER" read -r id title priority due status; do
+                printf "%-3s | %-20s | %-10b | %-12b | %-12b\n" "$id" "$title" "$(priority_color "$priority")" "$(date_color "$due")" "$(status_color "$status")"
+            done
+            ;;
+        2)
+            echo -e "${CYAN}--- Tasks Sorted by Priority ---${NC}"
+            sort -t"$DELIMITER" -k3 "$TASKS_FILE" | while IFS="$DELIMITER" read -r id title priority due status; do
+                printf "%-3s | %-20s | %-10b | %-12b | %-12b\n" "$id" "$title" "$(priority_color "$priority")" "$(date_color "$due")" "$(status_color "$status")"
+            done
+            ;;
+        3) ;;
+        *) echo -e "${RED}Invalid choice.${NC}" ;;
+    esac
 }
 
-####################################
-# bonus: sort
-####################################
-sort_tasks(){
-    echo ""
-    echo "== Sort =="
-    echo "1) by due date"
-    echo "2) by priority (high first)"
-    read -p "> " opt
+update_task() {
+    echo -e "${CYAN}--- Update Task ---${NC}"
+    read -p "Enter task ID to update: " id
+    id_exists "$id" || { echo -e "${RED}ID not found!${NC}"; return; }
 
-    echo ""
-    table_header
+    task=$(grep "^$id$DELIMITER" "$TASKS_FILE")
+    IFS="$DELIMITER" read -r _title _priority _due _status <<< "$(echo "$task" | cut -d"$DELIMITER" -f2-5)"
 
-    if [ "$opt" = "1" ]; then
-        sort -t"|" -k4 "$TASKS_FILE" | while IFS="|" read -r id title pri due stat; do
-            print_task "$id" "$title" "$pri" "$due" "$stat"
-        done
+    read -p "Enter new title ($_title): " title
+    title=${title:-$_title}
 
-    elif [ "$opt" = "2" ]; then
-        for p in high medium low; do
-            while IFS="|" read -r id title pri due stat; do
-                [ "$pri" = "$p" ] && print_task "$id" "$title" "$pri" "$due" "$stat"
-            done < "$TASKS_FILE"
-        done
-    else
-        echo "invalid"
-    fi
+    read -p "Enter new priority ($_priority): " priority
+    priority=${priority:-$_priority}
+    validate_priority "$priority" || return
+
+    read -p "Enter new due date ($_due): " due
+    due=${due:-$_due}
+    validate_date "$due" || return
+
+    read -p "Enter new status ($_status) [pending/in-progress/done]: " status
+    status=${status:-$_status}
+
+    sed -i "/^$id$DELIMITER/c\\$id$DELIMITER$title$DELIMITER$priority$DELIMITER$due$DELIMITER$status" "$TASKS_FILE"
+    echo -e "${GREEN}Task updated successfully!${NC}"
 }
 
-####################################
-# reports submenu
-####################################
-reports_menu(){
-    while true; do
-        echo ""
-        echo "== Reports =="
-        echo "1) summary"
-        echo "2) overdue"
-        echo "3) by priority"
-        echo "0) back"
-        read -p "> " opt
+delete_task() {
+    echo -e "${CYAN}--- Delete Task ---${NC}"
+    read -p "Enter task ID to delete: " id
+    id_exists "$id" || { echo -e "${RED}ID not found!${NC}"; return; }
 
-        case $opt in
-            1) summary_report ;;
-            2) overdue_report ;;
-            3) priority_report ;;
-            0) return ;;
-            *) echo "invalid" ;;
-        esac
+    read -p "Are you sure you want to delete task $id? (y/n): " confirm
+    [[ $confirm == "y" ]] && sed -i "/^$id$DELIMITER/d" "$TASKS_FILE" && echo -e "${GREEN}Task deleted.${NC}" || echo "Deletion cancelled."
+}
 
-        press_enter
+search_tasks() {
+    echo -e "${CYAN}--- Search Tasks ---${NC}"
+    read -p "Enter keyword or regex to search in titles: " keyword
+    grep -i -E "$keyword" "$TASKS_FILE" | while IFS="$DELIMITER" read -r id title priority due status; do
+        printf "%-3s | %-20s | %-10b | %-12b | %-12b\n" "$id" "$title" "$(priority_color "$priority")" "$(date_color "$due")" "$(status_color "$status")"
     done
 }
 
-####################################
-# main menu
-####################################
-main_menu(){
-    while true; do
-        clear
-        echo "=============================="
-        echo "      task manager            "
-        echo "=============================="
-        echo "1) add task"
-        echo "2) list tasks"
-        echo "3) update task"
-        echo "4) delete task"
-        echo "5) search"
-        echo "6) reports"
-        echo "7) export csv"
-        echo "8) sort"
-        echo "0) exit"
-        echo "=============================="
-        read -p "> " choice
+reports() {
+    echo -e "${CYAN}--- Reports ---${NC}"
+    echo "1) Task Summary"
+    echo "2) Overdue Tasks"
+    echo "3) Priority Report"
+    echo "4) Export to CSV"
+    read -p "Choose report: " choice
 
-        case $choice in
-            1) add_task    ;;
-            2) list_tasks  ;;
-            3) update_task ;;
-            4) delete_task ;;
-            5) search_tasks ;;
-            6) reports_menu ;;
-            7) export_csv  ;;
-            8) sort_tasks  ;;
-            0) echo "bye" ; exit 0 ;;
-            *) echo "wrong choice" ;;
-        esac
-
-        press_enter
-    done
+    case $choice in
+        1)
+            echo -e "${YELLOW}--- Task Summary ---${NC}"
+            awk -F"$DELIMITER" '{count[$5]++} END {for(s in count) print s ": " count[s]}' "$TASKS_FILE"
+            ;;
+        2)
+            echo -e "${YELLOW}--- Overdue Tasks ---${NC}"
+            today=$(date +%Y-%m-%d)
+            awk -F"$DELIMITER" -v today="$today" '$4 < today && $5 != "done"' "$TASKS_FILE" | while IFS="$DELIMITER" read -r id title priority due status; do
+                printf "%-3s | %-20s | %-10b | %-12b | %-12b\n" "$id" "$title" "$(priority_color "$priority")" "$(date_color "$due")" "$(status_color "$status")"
+            done
+            ;;
+        3)
+            echo -e "${YELLOW}--- Tasks by Priority ---${NC}"
+            sort -t"$DELIMITER" -k3 "$TASKS_FILE" | while IFS="$DELIMITER" read -r id title priority due status; do
+                printf "%-3s | %-20s | %-10b | %-12b | %-12b\n" "$id" "$title" "$(priority_color "$priority")" "$(date_color "$due")" "$(status_color "$status")"
+            done
+            ;;
+        4)
+            cp "$TASKS_FILE" tasks.csv
+            echo -e "${GREEN}Tasks exported to tasks.csv successfully!${NC}"
+            ;;
+        *)
+            echo -e "${RED}Invalid report choice.${NC}"
+            ;;
+    esac
 }
 
-# start
-main_menu
+# ----------------------
+# Main Menu
+# ----------------------
+while true; do
+    echo -e "\n${MAGENTA}--- Mini Task Manager ---${NC}"
+    echo "1) Add Task"
+    echo "2) List Tasks"
+    echo "3) Update Task"
+    echo "4) Delete Task"
+    echo "5) Search Tasks"
+    echo "6) Reports / Export"
+    echo "7) Exit"
+    read -p "Choose an option: " choice
+
+    case $choice in
+        1) add_task ;;
+        2) list_tasks ;;
+        3) update_task ;;
+        4) delete_task ;;
+        5) search_tasks ;;
+        6) reports ;;
+        7) echo -e "${GREEN}Goodbye!${NC}"; exit 0 ;;
+        *) echo -e "${RED}Invalid option. Try again.${NC}" ;;
+    esac
+done
