@@ -1,221 +1,46 @@
 # 🚀 Mini Task Manager (Bash CLI)
 
-![Bash](https://img.shields.io/badge/Bash-4%2B-blue)
-![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-lightgrey)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Status](https://img.shields.io/badge/Status-Active-success)
-
-A powerful Command-Line Task Management System built entirely using **Bash scripting**.
+A simple yet powerful Command-Line Task Manager built using **Bash scripting**.
 
 ---
 
 ## 📌 Overview
 
-Mini Task Manager is a fully interactive CLI application that allows users to:
+Mini Task Manager is an interactive CLI tool that allows you to:
 
-- Perform complete CRUD operations
-- Generate task reports
+- Add, list, update, and delete tasks
 - Search using Regex
-- Sort tasks dynamically
-- Export data to CSV
-- Detect overdue tasks automatically
-- Experience colored and formatted CLI output
-
-This project demonstrates real-world Bash scripting practices suitable for DevOps environments.
-
----
-
-## 🧠 Technical Highlights
-
-- File-based data persistence (`tasks.txt`)
-- Custom delimiter parsing (`|`)
-- Input validation (date, priority, ID existence)
-- Text processing using:
-  - awk
-  - sed
-  - grep
-  - sort
-  - cut
-- ANSI color formatting
-- Interactive menu loop
-- Defensive scripting techniques
-
----
-
-## 🏗️ Project Structure
-mini-task-manager/
-│
-├── task_manager.sh
-├── tasks.txt
-├── tasks.csv # Generated when exporting
-└── README.md
-
+- Generate reports
+- Export tasks to CSV
+- Highlight priorities and overdue tasks
 
 ---
 
 ## ⚙️ Installation
 
-### 1️⃣ Clone the repository
-
 ```bash
 git clone https://github.com/yourusername/mini-task-manager.git
 cd mini-task-manager
-2️⃣ Make the script executable
 chmod +x task_manager.sh
-3️⃣ Run the application
 ./task_manager.sh
+
+
 📋 Features
-✅ Core Functionalities
-Feature	Description
-Add Task	Create new tasks with validation
-List Tasks	Display formatted and colored table
-Update Task	Modify existing tasks safely
-Delete Task	Confirmation-based deletion
-Search	Regex-powered title search
-Reports	Summary, overdue, priority reports
-Export	Generate CSV file
-🎨 Smart CLI Design
+✅ Full CRUD operations
+🎨 Colored CLI output
+🔍 Regex-based search
+📊 Task summary & overdue reports
+📤 CSV export
+🛡️ Input validation (date, priority, ID)
 
-🔴 High priority = Red
+🧪 Task Format
+ID|Title|Priority|Due Date|Status
 
-🟡 Medium priority = Yellow
-
-🟢 Low priority = Green
-
-⏰ Overdue tasks highlighted automatically
-
-📊 Clean formatted table output
-
-🔄 Sorting by date or priority
-
-🛑 Error handling & validation feedback
-
-📊 Reports Module
-
-The Reports section includes:
-
-1️⃣ Task Summary
-
-Counts tasks grouped by status:
-
-pending
-
-in-progress
-
-done
-
-2️⃣ Overdue Tasks
-
-Displays tasks where:
-
-Due date < Current date
-
-Status is not "done"
-
-3️⃣ Priority Report
-
-Sorts tasks by priority level.
-
-4️⃣ Export to CSV
-
-Generates:
-
-tasks.csv
-🔎 Search Engine
-
-Supports:
-
-Case-insensitive search
-
-Extended regular expressions
-
-Example:
-
-project
-^Fix
-Task.*
-🛡️ Input Validation
-
-Date format enforced: YYYY-MM-DD
-
-Priority limited to: high, medium, low
-
-Prevents empty titles
-
-Verifies task ID before update/delete
-
-🧪 Example Task Format
-1|Deploy Web App|high|2026-03-01|pending
-
-Structure:
-
-ID | Title | Priority | Due Date | Status
 📦 Requirements
-
-Linux or macOS
-
+Linux / macOS
 Bash 4+
-
-Standard Unix utilities:
-
-awk
-
-sed
-
-grep
-
-sort
-
-cut
-
-date
-
-📈 DevOps Relevance
-
-This project demonstrates:
-
-Automation scripting
-
-CLI tool design
-
-File-based data management
-
-Structured shell architecture
-
-Production-style validation
-
-Text stream processing
-
-Useful for:
-
-Junior DevOps roles
-
-Linux System Administration
-
-Shell scripting interviews
-
-Automation portfolios
-
-🚀 Future Improvements
-
-JSON storage support
-
-Logging system
-
-User authentication
-
-Pagination
-
-Docker containerization
-
-REST API version (Flask / Node.js)
-
-CI/CD integration
-
-Unit testing framework
+awk, sed, grep, sort, cut, date
 
 👨‍💻 Author
-
 Moamen Lotfy
 DevOps Engineer
-Focused on Automation, CI/CD & Infrastructure Engineering
