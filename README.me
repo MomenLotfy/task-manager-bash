@@ -1,168 +1,220 @@
-# 📋 Task Manager — Bash Script
+🗂️ Mini Task Manager – Bash CLI Project
 
-A command-line Task Management System built entirely in **Bash**.  
-Supports full CRUD operations, filtering, reports, CSV export, and colored terminal output.
+Author: Moamen Lotfy
+Language: Bash
+Type: Command-Line Application
 
----
+📌 Overview
+Mini Task Manager is a command-line application (CLI) written in Bash that provides a comprehensive task management system (CRUD operations) with advanced reporting, search, sorting, and data export capabilities.
 
-## 📁 Project Structure
+The project demonstrates a strong understanding of:
 
-```
-├── task_manager.sh      # main script
-├── tasks.txt            # auto-generated data file (created on first run)
+Bash Scripting
+
+File Handling
+
+Text Processing (awk, sed, grep, sort)
+
+Input Validation
+
+ANSI Colors
+
+CLI UX Design
+
+🚀 Features
+✅ Core Features
+
+➕ Add Task
+
+📋 List Tasks (Formatted Table)
+
+✏️ Update Task
+
+🗑️ Delete Task
+
+🔍 Search (Supports Regex)
+
+📊 Reports & Statistics
+
+📤 Export to CSV
+
+🎨 Smart UI Features
+
+Colored output based on:
+
+Priority level
+
+Task status
+
+Overdue dates
+
+Clean formatted table display
+
+Interactive menu system
+
+Confirmation before delete
+
+Input validation
+
+🏗️ Project Structure
+mini-task-manager/
+│
+├── task_manager.sh
+├── tasks.txt
+├── tasks.csv (generated when exporting)
 └── README.md
-```
+🧠 How It Works
 
----
+Each task is stored inside:
 
-## 🚀 How to Run
+tasks.txt
 
-```bash
-bash task_manager.sh
-```
+With the following structure:
 
-> No dependencies needed — works on any Linux system with Bash installed.
+ID | Title | Priority | Due Date | Status
 
----
+Example:
 
-## 🗂️ Data Storage
+1|Finish Bash Project|high|2026-03-01|pending
 
-All tasks are stored in `tasks.txt`, one task per line, fields separated by `|`:
+Delimiter used: |
 
-```
-ID|Title|Priority|DueDate|Status
-```
+📥 Installation & Usage
+1️⃣ Clone the repository
+git clone https://github.com/yourusername/mini-task-manager.git
+cd mini-task-manager
+2️⃣ Make script executable
+chmod +x task_manager.sh
+3️⃣ Run the project
+./task_manager.sh
+📋 Main Menu
+1) Add Task
+2) List Tasks
+3) Update Task
+4) Delete Task
+5) Search Tasks
+6) Reports / Export
+7) Exit
+📊 Reports Available
+1️⃣ Task Summary
 
-**Example:**
-```
-1|Buy groceries|high|2025-06-01|pending
-2|Study for exam|medium|2025-05-20|in-progress
-3|Submit report|low|2025-04-10|done
-```
+Counts tasks by status:
 
-| Field    | Values                          |
-|----------|---------------------------------|
-| ID       | Auto-generated integer          |
-| Title    | Any text (no `\|` allowed)      |
-| Priority | `high` / `medium` / `low`       |
-| Due Date | `YYYY-MM-DD` format             |
-| Status   | `pending` / `in-progress` / `done` |
+pending
 
----
+in-progress
 
-## ✨ Features
+done
 
-### CRUD Operations
+2️⃣ Overdue Tasks
 
-| # | Feature     | Description                                              |
-|---|-------------|----------------------------------------------------------|
-| 1 | Add Task    | Enter title, priority, due date — ID and status auto-set |
-| 2 | List Tasks  | Display all tasks; filter by status or priority          |
-| 3 | Update Task | Select by ID, modify any field                           |
-| 4 | Delete Task | Select by ID, confirm before deleting                    |
-| 5 | Search      | Case-insensitive keyword search in task titles           |
+Displays tasks:
 
-### Reports
+Due date < Today
 
-| Report         | Description                                          |
-|----------------|------------------------------------------------------|
-| Summary        | Count of tasks per status                            |
-| Overdue Tasks  | Tasks past due date that are not `done`              |
-| By Priority    | Tasks grouped into high → medium → low               |
+Status ≠ done
 
-### Bonus Features
+3️⃣ Priority Report
 
-- 🎨 **Colored output** — priorities and statuses highlighted in different colors
-- 📤 **CSV Export** — exports tasks to a `.csv` file (opens in Excel / Google Sheets)
-- 🔃 **Sort** — sort tasks by due date or by priority
+Sorts tasks by:
 
----
+high
 
-## 🖥️ Main Menu
+medium
 
-```
-==============================
-      task manager
-==============================
-1) add task
-2) list tasks
-3) update task
-4) delete task
-5) search
-6) reports
-7) export csv
-8) sort
-0) exit
-==============================
-```
+low
 
----
+4️⃣ Export to CSV
 
-## ✅ Input Validation
+Creates:
 
-| Field    | Validation                                              |
-|----------|---------------------------------------------------------|
-| Title    | Cannot be empty                                         |
-| Priority | Must be exactly: `high`, `medium`, or `low`             |
-| Due Date | Must match `YYYY-MM-DD` and be a real calendar date     |
-| ID       | Must exist in file before update or delete              |
+tasks.csv
+🔎 Search System
 
----
+Supports:
 
-## 🔧 Key Bash Concepts Used
+Case-insensitive search
 
-| Concept               | Usage                                      |
-|-----------------------|--------------------------------------------|
-| `while IFS read`      | Reading and parsing the tasks file         |
-| `sed -i`              | In-place line replacement (update)         |
-| `grep -v`             | Filtering out deleted lines                |
-| `cut / awk`           | Field extraction                           |
-| `sort -t -k`          | Sorting by specific field                  |
-| `date -d`             | Date validation                            |
-| `grep -qE`            | Regex-based format checking                |
-| ANSI escape codes     | Terminal colors (`\033[0;31m` etc.)        |
-| `mktemp`              | Safe temporary file creation               |
-| `local` variables     | Scoped variables inside functions          |
+Regular Expressions (Regex)
 
----
+Example:
 
-## 🌈 Color Reference
+Enter keyword or regex to search in titles: project
+🛡️ Input Validation
 
-| Color    | Used For                    |
-|----------|-----------------------------|
-| 🔴 Red    | High priority / Errors      |
-| 🟡 Yellow | Medium priority / Pending   |
-| 🟢 Green  | Low priority / Done         |
-| 🔵 Cyan   | In-progress status          |
+✅ Date format: YYYY-MM-DD
 
----
+✅ Priority must be:
 
-## 📤 CSV Export
+high
 
-Running option `7` from the menu generates a file like:
+medium
 
-```
-tasks_export_20250601.csv
-```
+low
 
-Format:
-```csv
-ID,Title,Priority,Due Date,Status
-1,"Buy groceries",high,2025-06-01,pending
-2,"Study for exam",medium,2025-05-20,done
-```
+✅ Prevents empty titles
 
----
+✅ Validates Task ID existence
 
-## ⚠️ Known Limitations
+🧰 Technical Concepts Used
+Concept	Usage
+awk	Formatting & reporting
+sed	Updating & deleting records
+grep	Searching & ID validation
+sort	Sorting tasks
+cut	Extracting fields
+date	Overdue detection
+ANSI Escape Codes	Colored output
+🎯 Learning Objectives
 
-- Task titles cannot contain the `|` character (used as delimiter)
-- IDs are never reused after deletion (by design)
-- Concurrent access by multiple users is not supported
+This project demonstrates:
 
----
+File-based data persistence
 
-## 👤 Author
+CRUD implementation in Bash
 
-**Moamen Lotfy**  
-Bash Scripting Assignment — Linux Course
+Data parsing with custom delimiter
+
+CLI UX improvements
+
+Defensive scripting (validation & error handling)
+
+📌 Future Improvements
+
+JSON storage instead of text file
+
+Add pagination
+
+Add user authentication
+
+Add logging system
+
+Convert to POSIX-compatible version
+
+Dockerize the project
+
+Convert to REST API (Flask/Node)
+
+💻 Requirements
+
+Linux / macOS
+
+Bash 4+
+
+Standard Unix utilities:
+
+awk
+
+sed
+
+grep
+
+sort
+
+cut
+
+👨‍💻 Author
+
+Moamen Lotfy
+DevOps Engineer
+Focused on Automation, CI/CD, and Infrastructure
