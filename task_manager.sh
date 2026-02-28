@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 # =============================================================================
 # Mini Task Manager - Bash Project by Moamen Lotfy
 # =============================================================================
@@ -69,7 +69,6 @@ add_task() {
     echo -e "${GREEN}Task added successfully!${NC}"
 }
 
-# Function to color-code status
 status_color() {
     case $1 in
         pending) echo -e "${YELLOW}$1${NC}" ;;
@@ -79,7 +78,6 @@ status_color() {
     esac
 }
 
-# Function to color-code priority
 priority_color() {
     case $1 in
         high) echo -e "${RED}$1${NC}" ;;
@@ -89,7 +87,6 @@ priority_color() {
     esac
 }
 
-# Function to highlight overdue dates
 date_color() {
     today=$(date +%Y-%m-%d)
     if [[ "$1" < "$today" ]]; then
