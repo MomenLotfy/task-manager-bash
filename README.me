@@ -1,104 +1,102 @@
-🗂️ Mini Task Manager – Bash CLI Project
+# 🚀 Mini Task Manager (Bash CLI)
 
-Author: Moamen Lotfy
-Language: Bash
-Type: Command-Line Application
+![Bash](https://img.shields.io/badge/Bash-4%2B-blue)
+![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-lightgrey)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
-📌 Overview
-Mini Task Manager is a command-line application (CLI) written in Bash that provides a comprehensive task management system (CRUD operations) with advanced reporting, search, sorting, and data export capabilities.
+A powerful Command-Line Task Management System built entirely using **Bash scripting**.
 
-The project demonstrates a strong understanding of:
+---
 
-Bash Scripting
+## 📌 Overview
 
-File Handling
+Mini Task Manager is a fully interactive CLI application that allows users to:
 
-Text Processing (awk, sed, grep, sort)
+- Perform complete CRUD operations
+- Generate task reports
+- Search using Regex
+- Sort tasks dynamically
+- Export data to CSV
+- Detect overdue tasks automatically
+- Experience colored and formatted CLI output
 
-Input Validation
+This project demonstrates real-world Bash scripting practices suitable for DevOps environments.
 
-ANSI Colors
+---
 
-CLI UX Design
+## 🧠 Technical Highlights
 
-🚀 Features
-✅ Core Features
+- File-based data persistence (`tasks.txt`)
+- Custom delimiter parsing (`|`)
+- Input validation (date, priority, ID existence)
+- Text processing using:
+  - awk
+  - sed
+  - grep
+  - sort
+  - cut
+- ANSI color formatting
+- Interactive menu loop
+- Defensive scripting techniques
 
-➕ Add Task
+---
 
-📋 List Tasks (Formatted Table)
-
-✏️ Update Task
-
-🗑️ Delete Task
-
-🔍 Search (Supports Regex)
-
-📊 Reports & Statistics
-
-📤 Export to CSV
-
-🎨 Smart UI Features
-
-Colored output based on:
-
-Priority level
-
-Task status
-
-Overdue dates
-
-Clean formatted table display
-
-Interactive menu system
-
-Confirmation before delete
-
-Input validation
-
-🏗️ Project Structure
+## 🏗️ Project Structure
 mini-task-manager/
 │
 ├── task_manager.sh
 ├── tasks.txt
-├── tasks.csv (generated when exporting)
+├── tasks.csv # Generated when exporting
 └── README.md
-🧠 How It Works
 
-Each task is stored inside:
 
-tasks.txt
+---
 
-With the following structure:
+## ⚙️ Installation
 
-ID | Title | Priority | Due Date | Status
+### 1️⃣ Clone the repository
 
-Example:
-
-1|Finish Bash Project|high|2026-03-01|pending
-
-Delimiter used: |
-
-📥 Installation & Usage
-1️⃣ Clone the repository
+```bash
 git clone https://github.com/yourusername/mini-task-manager.git
 cd mini-task-manager
-2️⃣ Make script executable
+2️⃣ Make the script executable
 chmod +x task_manager.sh
-3️⃣ Run the project
+3️⃣ Run the application
 ./task_manager.sh
-📋 Main Menu
-1) Add Task
-2) List Tasks
-3) Update Task
-4) Delete Task
-5) Search Tasks
-6) Reports / Export
-7) Exit
-📊 Reports Available
+📋 Features
+✅ Core Functionalities
+Feature	Description
+Add Task	Create new tasks with validation
+List Tasks	Display formatted and colored table
+Update Task	Modify existing tasks safely
+Delete Task	Confirmation-based deletion
+Search	Regex-powered title search
+Reports	Summary, overdue, priority reports
+Export	Generate CSV file
+🎨 Smart CLI Design
+
+🔴 High priority = Red
+
+🟡 Medium priority = Yellow
+
+🟢 Low priority = Green
+
+⏰ Overdue tasks highlighted automatically
+
+📊 Clean formatted table output
+
+🔄 Sorting by date or priority
+
+🛑 Error handling & validation feedback
+
+📊 Reports Module
+
+The Reports section includes:
+
 1️⃣ Task Summary
 
-Counts tasks by status:
+Counts tasks grouped by status:
 
 pending
 
@@ -108,96 +106,53 @@ done
 
 2️⃣ Overdue Tasks
 
-Displays tasks:
+Displays tasks where:
 
-Due date < Today
+Due date < Current date
 
-Status ≠ done
+Status is not "done"
 
 3️⃣ Priority Report
 
-Sorts tasks by:
-
-high
-
-medium
-
-low
+Sorts tasks by priority level.
 
 4️⃣ Export to CSV
 
-Creates:
+Generates:
 
 tasks.csv
-🔎 Search System
+🔎 Search Engine
 
 Supports:
 
 Case-insensitive search
 
-Regular Expressions (Regex)
+Extended regular expressions
 
 Example:
 
-Enter keyword or regex to search in titles: project
+project
+^Fix
+Task.*
 🛡️ Input Validation
 
-✅ Date format: YYYY-MM-DD
+Date format enforced: YYYY-MM-DD
 
-✅ Priority must be:
+Priority limited to: high, medium, low
 
-high
+Prevents empty titles
 
-medium
+Verifies task ID before update/delete
 
-low
+🧪 Example Task Format
+1|Deploy Web App|high|2026-03-01|pending
 
-✅ Prevents empty titles
+Structure:
 
-✅ Validates Task ID existence
+ID | Title | Priority | Due Date | Status
+📦 Requirements
 
-🧰 Technical Concepts Used
-Concept	Usage
-awk	Formatting & reporting
-sed	Updating & deleting records
-grep	Searching & ID validation
-sort	Sorting tasks
-cut	Extracting fields
-date	Overdue detection
-ANSI Escape Codes	Colored output
-🎯 Learning Objectives
-
-This project demonstrates:
-
-File-based data persistence
-
-CRUD implementation in Bash
-
-Data parsing with custom delimiter
-
-CLI UX improvements
-
-Defensive scripting (validation & error handling)
-
-📌 Future Improvements
-
-JSON storage instead of text file
-
-Add pagination
-
-Add user authentication
-
-Add logging system
-
-Convert to POSIX-compatible version
-
-Dockerize the project
-
-Convert to REST API (Flask/Node)
-
-💻 Requirements
-
-Linux / macOS
+Linux or macOS
 
 Bash 4+
 
@@ -213,8 +168,54 @@ sort
 
 cut
 
+date
+
+📈 DevOps Relevance
+
+This project demonstrates:
+
+Automation scripting
+
+CLI tool design
+
+File-based data management
+
+Structured shell architecture
+
+Production-style validation
+
+Text stream processing
+
+Useful for:
+
+Junior DevOps roles
+
+Linux System Administration
+
+Shell scripting interviews
+
+Automation portfolios
+
+🚀 Future Improvements
+
+JSON storage support
+
+Logging system
+
+User authentication
+
+Pagination
+
+Docker containerization
+
+REST API version (Flask / Node.js)
+
+CI/CD integration
+
+Unit testing framework
+
 👨‍💻 Author
 
 Moamen Lotfy
 DevOps Engineer
-Focused on Automation, CI/CD, and Infrastructure
+Focused on Automation, CI/CD & Infrastructure Engineering
